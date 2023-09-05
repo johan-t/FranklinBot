@@ -1,3 +1,6 @@
+const axios = require('axios');
+const { github_token } = require('../config.json');
+
 async function handleClub100(interaction) {
     const dmChannel = await interaction.user.createDM();
 
@@ -9,16 +12,35 @@ async function handleClub100(interaction) {
 
     collector.on('collect', async m => {
         console.log(`Collected ${m.content}`);
-        
+
         // Check if it's a GitHub PR link
-        const isGithubPR = m.content.match(/^https:\/\/github.com\/[\w-]+\/[\w-]+\/pull\/\d+$/);
+        const isGithubPR = m.content.match(/^https:\/\/github.com\/([\w-]+)\/([\w-]+)\/pull\/(\d+)$/);
 
         if (isGithubPR) {
-            await dmChannel.send("Congrats! You are a Club 100 member! 🎉");
+            const [_, owner, repo, pull_number] = isGithubPR;
+
+            try {
+                const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}/pulls/${pull_number}`, {
+                    headers: {
+                        'Authorization': `token ${github_token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (response.data.merged === true) {
+                    await dmChannel.send("Congrats! You are a Club 100 member! 🎉");
+                } else {
+                    await dmChannel.send("This PR has not been merged. 😔");
+                }
+            } catch (err) {
+                console.error(err);
+                await dmChannel.send("An error occurred while checking your PR. 😭");
+            }
+            
+            collector.stop();
         } else {
             await dmChannel.send("Wrong link buddy, try again 😢");
         }
-        collector.stop();
     });
 }
 
