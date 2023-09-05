@@ -16,7 +16,7 @@ client.on('interactionCreate', async interaction => {
     if (interaction.commandName === 'club100') {
         try {
             await interaction.reply('Check your DMs! 📩');
-            handleClub100(interaction);
+            handleClub100(interaction, client);
         } catch (error) {
             console.error(`Failed to handle /club100 command: ${error}`);
         }
