@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const { github_token } = require('../config.json');
 
 async function addClub100Role(userId, guild) {
-    const roleID = '1148643253550325861';
+    const roleID = '1148905597572485151';
     const member = await guild.members.fetch(userId);
     const role = guild.roles.cache.get(roleID);
   
